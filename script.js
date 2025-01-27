@@ -2,8 +2,8 @@ const canvas = document.getElementById('gameCanvas');
 const ctx = canvas.getContext('2d');
 
 // Responsive canvas size
-canvas.width = window.innerWidth * 0.9; // 90% of screen width
-canvas.height = window.innerHeight * 0.5; // 50% of screen height
+canvas.width = window.innerWidth * 0.9;
+canvas.height = window.innerHeight * 0.5;
 
 let timer = 15;
 let score = 0;
@@ -13,13 +13,13 @@ let interval;
 
 // Asset paths
 const assets = {
-  characters: ['character1.png', 'character2.png', 'character3.png'],
-  dresses: ['dress1.png', 'dress2.png', 'dress3.png'],
-  shoes: ['shoes1.png', 'shoes2.png', 'shoes3.png'],
+  characters: ['assets/character1.png', 'assets/character2.png', 'assets/character3.png'],
+  dresses: ['assets/dress1.png', 'assets/dress2.png', 'assets/dress3.png'],
+  shoes: ['assets/shoes1.png', 'assets/shoes2.png', 'assets/shoes3.png'],
   environments: {
-    room: 'room.png',
-    closet: 'closet.png',
-    garden: 'garden.png'
+    room: 'assets/room.png',
+    closet: 'assets/closet.png',
+    garden: 'assets/garden.png'
   }
 };
 
@@ -73,19 +73,19 @@ function endLevel() {
 // Render Character Selection
 function renderCharacterSelection() {
   drawEnvironment(assets.environments.room);
-  drawAnimatedCharacters();
+  drawOptions(assets.characters, 'character');
 }
 
 // Render Dress Selection
 function renderDressSelection() {
   drawEnvironment(assets.environments.closet);
-  drawAnimatedOptions(assets.dresses, 'dress');
+  drawOptions(assets.dresses, 'dress');
 }
 
 // Render Shoe Selection
 function renderShoeSelection() {
   drawEnvironment(assets.environments.garden);
-  drawAnimatedOptions(assets.shoes, 'shoes');
+  drawOptions(assets.shoes, 'shoes');
 }
 
 // Draw Environment
@@ -93,27 +93,13 @@ function drawEnvironment(imageSrc) {
   const img = new Image();
   img.src = imageSrc;
   img.onload = () => {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
     ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
   };
 }
 
-// Draw Animated Characters
-function drawAnimatedCharacters() {
-  assets.characters.forEach((character, index) => {
-    const img = new Image();
-    img.src = character;
-    img.onload = () => {
-      const scaledWidth = canvas.width / 5;
-      const scaledHeight = scaledWidth * (img.height / img.width);
-      ctx.drawImage(img, 100 + index * (scaledWidth + 20), 150, scaledWidth, scaledHeight);
-    };
-  });
-
-  canvas.addEventListener('touchstart', handleSelection); // Touch support
-}
-
-// Draw Animated Options (Dresses or Shoes)
-function drawAnimatedOptions(items, type) {
+// Draw Options
+function drawOptions(items, type) {
   items.forEach((item, index) => {
     const img = new Image();
     img.src = item;
@@ -124,21 +110,16 @@ function drawAnimatedOptions(items, type) {
     };
   });
 
-  canvas.addEventListener('touchstart', handleSelection);
-}
-
-// Handle Selection
-function handleSelection(e) {
-  const x = e.touches ? e.touches[0].clientX - canvas.offsetLeft : e.offsetX;
-  if (level === 1) selectedOptions.character = x <= canvas.width / 2 ? 'Character 1' : 'Character 2';
-  else if (level === 2) selectedOptions.dress = x <= canvas.width / 2 ? 'Dress 1' : 'Dress 2';
-  else if (level === 3) selectedOptions.shoes = x <= canvas.width / 2 ? 'Shoes 1' : 'Shoes 2';
+  canvas.addEventListener('click', (e) => {
+    const x = e.offsetX;
+    selectedOptions[type] = x <= canvas.width / 2 ? items[0] : items[1];
+  });
 }
 
 // Show Ad
 function showAd(callback) {
   window.open('https://example.com', '_blank'); // Replace with your ad link
-  setTimeout(callback, 10000); // Wait for 10 seconds
+  setTimeout(callback, 10000);
 }
 
 // Show Final Results

@@ -7,8 +7,20 @@ canvas.height = 400;
 let timer = 15;
 let score = 0;
 let level = 1;
-let selectedOptions = { character: '', dress: '', shoes: '', hair: '' };
+let selectedOptions = { character: '', dress: '', shoes: '' };
 let interval;
+
+// Character and asset images
+const assets = {
+  characters: ['character1.png', 'character2.png', 'character3.png'],
+  dresses: ['dress1.png', 'dress2.png', 'dress3.png'],
+  shoes: ['shoes1.png', 'shoes2.png', 'shoes3.png'],
+  environments: {
+    room: 'room.png',
+    closet: 'closet.png',
+    garden: 'garden.png'
+  }
+};
 
 // Start Game
 document.getElementById('startGame').addEventListener('click', () => {
@@ -21,30 +33,23 @@ function resetGame() {
   timer = 15;
   score = 0;
   level = 1;
-  selectedOptions = { character: '', dress: '', shoes: '', hair: '' };
+  selectedOptions = { character: '', dress: '', shoes: '' };
   document.getElementById('timer').innerText = `Time: ${timer}s`;
   document.getElementById('score').innerText = `Score: ${score}`;
 }
 
-// Start a Level
+// Start Level
 function startLevel(currentLevel) {
   level = currentLevel;
   timer = 15;
 
-  if (level === 1) {
-    renderCharacterSelection();
-  } else if (level === 2) {
-    renderDressSelection();
-  } else if (level === 3) {
-    renderShoeSelection();
-  } else if (level === 4) {
-    renderHairSelection();
-  }
+  if (level === 1) renderCharacterSelection();
+  else if (level === 2) renderDressSelection();
+  else if (level === 3) renderShoeSelection();
 
   interval = setInterval(() => {
     timer--;
     document.getElementById('timer').innerText = `Time: ${timer}s`;
-
     if (timer <= 0) {
       clearInterval(interval);
       endLevel();
@@ -54,7 +59,7 @@ function startLevel(currentLevel) {
 
 // End Level
 function endLevel() {
-  if (level < 4) {
+  if (level < 3) {
     showAd(() => {
       startLevel(level + 1);
     });
@@ -66,109 +71,88 @@ function endLevel() {
 
 // Render Character Selection
 function renderCharacterSelection() {
-  clearCanvas();
-  ctx.font = '20px Arial';
-  ctx.fillText('Select Your Character', 200, 50);
-
-  const characters = ['Character 1', 'Character 2', 'Character 3'];
-  characters.forEach((char, i) => {
-    ctx.fillStyle = '#007bff';
-    ctx.fillRect(100, 100 + i * 80, 400, 50);
-    ctx.fillStyle = '#fff';
-    ctx.fillText(char, 250, 130 + i * 80);
-
-    canvas.addEventListener('click', (e) => {
-      if (e.offsetY > 100 + i * 80 && e.offsetY < 150 + i * 80) {
-        selectedOptions.character = char;
-      }
-    });
-  });
+  drawEnvironment(assets.environments.room);
+  drawAnimatedCharacters();
 }
 
 // Render Dress Selection
 function renderDressSelection() {
-  clearCanvas();
-  ctx.font = '20px Arial';
-  ctx.fillText('Select a Dress', 230, 50);
-
-  const dresses = ['Red Dress', 'Blue Dress', 'Green Dress'];
-  dresses.forEach((dress, i) => {
-    ctx.fillStyle = '#ff5733';
-    ctx.fillRect(100, 100 + i * 80, 400, 50);
-    ctx.fillStyle = '#fff';
-    ctx.fillText(dress, 250, 130 + i * 80);
-
-    canvas.addEventListener('click', (e) => {
-      if (e.offsetY > 100 + i * 80 && e.offsetY < 150 + i * 80) {
-        selectedOptions.dress = dress;
-      }
-    });
-  });
+  drawEnvironment(assets.environments.closet);
+  drawAnimatedOptions(assets.dresses, 'dress');
 }
 
 // Render Shoe Selection
 function renderShoeSelection() {
-  clearCanvas();
-  ctx.font = '20px Arial';
-  ctx.fillText('Select Shoes', 230, 50);
+  drawEnvironment(assets.environments.garden);
+  drawAnimatedOptions(assets.shoes, 'shoes');
+}
 
-  const shoes = ['Red Shoes', 'Black Shoes', 'White Shoes'];
-  shoes.forEach((shoe, i) => {
-    ctx.fillStyle = '#42a5f5';
-    ctx.fillRect(100, 100 + i * 80, 400, 50);
-    ctx.fillStyle = '#fff';
-    ctx.fillText(shoe, 250, 130 + i * 80);
+// Draw Environment
+function drawEnvironment(imageSrc) {
+  const img = new Image();
+  img.src = imageSrc;
+  img.onload = () => {
+    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+  };
+}
 
-    canvas.addEventListener('click', (e) => {
-      if (e.offsetY > 100 + i * 80 && e.offsetY < 150 + i * 80) {
-        selectedOptions.shoes = shoe;
-      }
-    });
+// Draw Animated Characters
+function drawAnimatedCharacters() {
+  assets.characters.forEach((character, index) => {
+    const img = new Image();
+    img.src = character;
+    img.onload = () => {
+      ctx.drawImage(img, 100 + index * 150, 150, 100, 200);
+      ctx.fillStyle = '#fff';
+      ctx.font = '16px Arial';
+      ctx.fillText(`Character ${index + 1}`, 120 + index * 150, 370);
+    };
+  });
+
+  canvas.addEventListener('click', (e) => {
+    const x = e.offsetX;
+    if (x >= 100 && x <= 200) selectedOptions.character = 'Character 1';
+    if (x >= 250 && x <= 350) selectedOptions.character = 'Character 2';
+    if (x >= 400 && x <= 500) selectedOptions.character = 'Character 3';
   });
 }
 
-// Render Hair Selection
-function renderHairSelection() {
-  clearCanvas();
-  ctx.font = '20px Arial';
-  ctx.fillText('Select a Hairstyle', 200, 50);
-
-  const hairstyles = ['Blonde Hair', 'Brown Hair', 'Black Hair'];
-  hairstyles.forEach((hair, i) => {
-    ctx.fillStyle = '#d1a359';
-    ctx.fillRect(100, 100 + i * 80, 400, 50);
-    ctx.fillStyle = '#fff';
-    ctx.fillText(hair, 250, 130 + i * 80);
-
-    canvas.addEventListener('click', (e) => {
-      if (e.offsetY > 100 + i * 80 && e.offsetY < 150 + i * 80) {
-        selectedOptions.hair = hair;
-      }
-    });
+// Draw Animated Options (Dresses or Shoes)
+function drawAnimatedOptions(items, type) {
+  items.forEach((item, index) => {
+    const img = new Image();
+    img.src = item;
+    img.onload = () => {
+      ctx.drawImage(img, 100 + index * 150, 150, 100, 100);
+      ctx.fillStyle = '#fff';
+      ctx.font = '16px Arial';
+      ctx.fillText(`${type} ${index + 1}`, 120 + index * 150, 270);
+    };
   });
-}
 
-// Clear Canvas
-function clearCanvas() {
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  canvas.addEventListener('click', (e) => {
+    const x = e.offsetX;
+    if (x >= 100 && x <= 200) selectedOptions[type] = `${type} 1`;
+    if (x >= 250 && x <= 350) selectedOptions[type] = `${type} 2`;
+    if (x >= 400 && x <= 500) selectedOptions[type] = `${type} 3`;
+  });
 }
 
 // Show Ad
 function showAd(callback) {
-  window.open('https://example.com', '_blank'); // Replace with an actual ad link
+  window.open('https://example.com', '_blank'); // Replace with actual ad link
   setTimeout(callback, 10000);
 }
 
 // Show Final Results
 function showFinalResults() {
-  clearCanvas();
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
   ctx.font = '20px Arial';
-  ctx.fillText('Your Final Selection', 200, 50);
+  ctx.fillText('Your Final Selections', 200, 50);
   ctx.fillText(`Character: ${selectedOptions.character}`, 50, 100);
   ctx.fillText(`Dress: ${selectedOptions.dress}`, 50, 150);
   ctx.fillText(`Shoes: ${selectedOptions.shoes}`, 50, 200);
-  ctx.fillText(`Hair: ${selectedOptions.hair}`, 50, 250);
-  ctx.fillText(`Score: ${score}`, 50, 300);
+  ctx.fillText(`Score: ${score}`, 50, 250);
 }
 
 // Calculate Score

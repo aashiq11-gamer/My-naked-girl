@@ -1,3 +1,4 @@
+/* General Styling */
 body {
   margin: 0;
   font-family: Arial, sans-serif;
@@ -28,11 +29,13 @@ header h1 {
   color: #555;
 }
 
+/* Canvas Styling */
 #gameCanvas {
   background: #e0e0e0;
   border: 2px solid #333;
   margin: 20px auto;
   display: block;
+  animation: fadeIn 1.5s;
 }
 
 #ad-space {
@@ -53,4 +56,27 @@ button {
 
 button:hover {
   background-color: #0056b3;
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+.animated {
+  animation: float 2s infinite;
 }
